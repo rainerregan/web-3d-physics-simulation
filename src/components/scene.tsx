@@ -1,67 +1,50 @@
-import { Grid, OrbitControls, OrthographicCamera } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
-import React, { useRef } from 'react'
-import * as THREE from 'three'
+import React from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Physics, useBox, usePlane } from '@react-three/cannon';
+import * as THREE from 'three';
 
-const Scene = () => {
-  const cameraRef = useRef<THREE.OrthographicCamera>(null);
-
-  // Update camera position every frame
-  useFrame(() => {
-    if (cameraRef.current) {
-      cameraRef.current.position.set(10, 10, 10); // Position for isometric view
-      cameraRef.current.lookAt(0, 0, 0); // Look at the center of the scene
-    }
-  });
+// Plane component (ground)
+const Ground: React.FC = () => {
+  const [ref] = usePlane<THREE.Mesh>(() => ({
+    rotation: [-Math.PI / 2, 0, 0],
+    position: [0, 0, 0],
+    type: 'Static',
+  }));
 
   return (
-    <>
-      {/* Isometric Camera */}
-      <OrthographicCamera
-        ref={cameraRef}
-        makeDefault // Makes this camera the default for the scene
-        zoom={100} // Adjust zoom level for scale
-        near={0.1}
-        far={1000}
-        position={[10, 10, 10]}
-      />
+    <mesh ref={ref} receiveShadow>
+      <planeGeometry args={[50, 50]} />
+      <meshStandardMaterial color="lightgreen" />
+    </mesh>
+  );
+};
 
-      {/* Ground */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, 0, 0]}
-        receiveShadow
-      >
-        <planeGeometry args={[50, 50]} />
-        <meshStandardMaterial color="brown" />
-      </mesh>
+// Box component (dynamic object)
+const Box: React.FC<{ position: [number, number, number] }> = ({ position }) => {
+  const [ref] = useBox<THREE.Mesh>(() => ({
+    mass: 1,
+    position,
+    castShadow: true,
+    receiveShadow: true,
+  }));
 
-      {/* A basic cube */}
-      <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="orange" />
-      </mesh>
+  return (
+    <mesh ref={ref} castShadow receiveShadow>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="orange" />
+    </mesh>
+  );
+};
 
-      {/* Lighting */}
-      <ambientLight intensity={0.5} />
-      <directionalLight
-        castShadow
-        position={[5, 2, 1]}
-        intensity={1}
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        // shadow-camera-near={0.5}
-        // shadow-camera-far={20}
-        // shadow-camera-left={-10}
-        // shadow-camera-right={10}
-        // shadow-camera-top={10}
-        // shadow-camera-bottom={-10}
-      />
+const PhysicsScene: React.FC = () => {
+  return (
+    <Physics>
+      <Ground />
+      <Box position={[0, 5, 0]} />
+      <Box position={[2, 10, 0]} />
+      <Box position={[-2, 15, 0]} />
+    </Physics>
+  );
+};
 
-      {/* Grid */}
-      {/* <Grid infiniteGrid /> */}
-    </>
-  )
-}
-
-export default Scene
+export default PhysicsScene;
