@@ -1,7 +1,5 @@
 "use client"
 import PhysicsScene from '@/components/scene'
-import Scene from '@/components/scene'
-import { Physics } from '@react-three/cannon'
 import { OrthographicCamera } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
@@ -13,7 +11,7 @@ const Camera = () => {
   // Update camera position every frame
   useFrame(() => {
     if (cameraRef.current) {
-      cameraRef.current.position.set(10, 10, 10); // Position for isometric view
+      cameraRef.current.position.set(10, 5, 10); // Position for isometric view
       cameraRef.current.lookAt(0, 0, 0); // Look at the center of the scene
     }
   });
@@ -25,7 +23,7 @@ const Camera = () => {
       zoom={100} // Adjust zoom level for scale
       near={0.1}
       far={1000}
-      position={[10, 10, 10]}
+      position={[10, 5, 10]}
     />
   )
 }
