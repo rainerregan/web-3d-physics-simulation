@@ -1,5 +1,6 @@
 import { Physics, useBox, usePlane, usePointToPointConstraint, useSphere } from '@react-three/cannon';
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
+import { useControls } from 'leva';
 import React, { createRef, RefObject, useCallback, useEffect } from 'react';
 import * as THREE from 'three';
 
@@ -84,8 +85,16 @@ const Box: React.FC<{ position: [number, number, number] }> = ({ position }) => 
 };
 
 const PhysicsScene: React.FC = () => {
+  const controls = useControls({
+    gravity: { value: -9.82, step: 0.1 },
+  });
+
   return (
-    <Physics>
+    <Physics gravity={[
+      0,
+      controls.gravity,
+      0,
+    ]}>
       <Ground />
       <Cursor />
       <Box position={[0, 5, 0]} />
